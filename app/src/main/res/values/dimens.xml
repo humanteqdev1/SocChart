@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="soc_chart_text_size">10sp</dimen>
+    <dimen name="soc_chart_stroke_width">2dp</dimen>
+    <dimen name="soc_chart_line_stroke_width">1px</dimen>
+    <dimen name="initial_radius">10dp</dimen>
+    <dimen name="soc_chart_text_stroke_width">0.5dp</dimen>
+    <dimen name="soc_chart_cluster_name_radius_offset">48dp</dimen>
+    <dimen name="soc_chart_cluster_name_stroke_width">1dp</dimen>
+</resources>
