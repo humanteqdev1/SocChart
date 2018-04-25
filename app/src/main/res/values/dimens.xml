@@ -6,5 +6,5 @@
     <dimen name="initial_radius">10dp</dimen>
     <dimen name="soc_chart_text_stroke_width">0.5dp</dimen>
     <dimen name="soc_chart_cluster_name_radius_offset">48dp</dimen>
-    <dimen name="soc_chart_cluster_name_stroke_width">1dp</dimen>
+    <dimen name="soc_chart_cluster_name_stroke_width">2px</dimen>
 </resources>

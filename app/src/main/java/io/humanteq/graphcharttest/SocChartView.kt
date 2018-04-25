@@ -3,10 +3,10 @@ package io.humanteq.graphcharttest
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -19,6 +19,8 @@ import kotlin.math.sin
 
 
 class SocChartView : View {
+    private var ignoreEvents = false
+
     constructor(context: Context) : this(context, null)
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -50,6 +52,12 @@ class SocChartView : View {
         paintLine.style = Paint.Style.STROKE
         paintLine.strokeCap = Paint.Cap.ROUND
 
+        paintLineDotted.color = ContextCompat.getColor(context, R.color.white)
+        paintLineDotted.strokeWidth = resources.getDimension(R.dimen.soc_chart_line_stroke_width)
+        paintLineDotted.style = Paint.Style.STROKE
+        paintLine.strokeCap = Paint.Cap.ROUND
+        paintLineDotted.pathEffect = DashPathEffect(floatArrayOf(context.fsp(3f), context.fsp(2f)), 0f)
+
         paintTextBg.color = ContextCompat.getColor(context, R.color.very_white)
         paintTextBg.textSize = paintText.textSize + 1
         paintTextBg.strokeWidth = resources.getDimension(R.dimen.soc_chart_text_stroke_width)
@@ -60,7 +68,7 @@ class SocChartView : View {
     }
 
     val json2 = "{" +
-            "  \"friends\": 13," +
+            "  \"friends\": 153," +
             "  \"communities\": [" +
             "    {" +
             "      \"name\": \"imya\"," +
@@ -129,221 +137,6 @@ class SocChartView : View {
             "  ]" +
             "}"
 
-    val json = "{" +
-            "  \"friends\": 13," +
-            "  \"communities\": [" +
-            "    {" +
-            "      \"name\": \"друзья\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья2\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья3\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья4\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }," +
-            "    {" +
-            "      \"name\": \"друзья5\"," +
-            "      \"data\": [" +
-            "        762881," +
-            "        63579140," +
-            "        22512645," +
-            "        444772," +
-            "        5253131," +
-            "        23634971," +
-            "        6872604," +
-            "        2013189," +
-            "        2587680," +
-            "        19613731," +
-            "        511020" +
-            "      ]" +
-            "    }" +
-            "  ]" +
-            "}"
-
-
     private var mScaleFactor = 1f
     private var transX = 1f
     private var transY = 1f
@@ -364,6 +157,7 @@ class SocChartView : View {
     private val paintText = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paintTextBg = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paintLine = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val paintLineDotted = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paintTextLine = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paintBgWhite = Paint(Paint.ANTI_ALIAS_FLAG)
 
@@ -418,7 +212,7 @@ class SocChartView : View {
         paint.color = ContextCompat.getColor(context, R.color.colorAccent)
         pointList.add(SocPoint(screenCenterX, screenCenterY, paint.color))
 
-        val angleStep = (100 + rand.nextInt(260)) / model.friends
+        val angleStep = (190 + rand.nextInt(170)) / model.friends
         val radius = initialRadius + rand.nextInt(60)
         var prevX = screenCenterX
         var prevY = screenCenterY
@@ -471,10 +265,10 @@ class SocChartView : View {
             val yC = (screenCenterY + y).toFloat()
             pointList.add(SocPoint(xC, yC, paint.color))
             lineList.add(SocLine(screenCenterX, screenCenterY, xC, yC, paintLine))
-            val text = clusters[angle].name
-            val textWidth = paintText.measureText(text)
 
             //Draw name of cluster
+            val text = clusters[angle].name
+            val textWidth = paintText.measureText(text)
             val textRadius = clusterNameRadiusOffset
             val textX: Float = (xC + textRadius * cos(radian + randomRadianOffset + .2f)).toFloat()
             val textY: Float = (yC + textRadius * sin(radian + randomRadianOffset + .3f)).toFloat()
@@ -486,13 +280,13 @@ class SocChartView : View {
 
             textList.add(SocText(text, fixedTextX, textY, textX, textY, xC, yC, paintText, paintTextLine))
 
-            buildCluster(xC, yC, clusters[angle], color, canvas)
+            buildCluster(xC, yC, clusters[angle], color)
         }
 
         drawMainPointAndFiends(canvas)
     }
 
-    private fun buildCluster(parentCentralX: Float, parentCentralY: Float, cluster: CommunityModel2, color: Int, canvas: Canvas?) {
+    private fun buildCluster(parentCentralX: Float, parentCentralY: Float, cluster: CommunityModel2, color: Int) {
         if (cluster.size == 0)
             return
 
@@ -517,9 +311,9 @@ class SocChartView : View {
             val yC = (parentCentralY + y).toFloat()
             val drawLineRandom = rand.nextInt(100)
             if (drawLineRandom % 7 == 0)
-                lineList.add(SocLine(parentCentralX, parentCentralY, xC, yC, paintLine))
+                lineList.add(SocLine(parentCentralX, parentCentralY, xC, yC, paintLineDotted))
             pointList.add(SocPoint(xC, yC, paint.color))
-            lineList.add(SocLine(prevX, prevY, xC, yC, paintLine))
+            lineList.add(SocLine(prevX, prevY, xC, yC, paintLineDotted))
             prevX = xC
             prevY = yC
         }
@@ -536,7 +330,6 @@ class SocChartView : View {
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            Log.e("---", " onScale")
             mScaleFactor *= detector.scaleFactor
 
             scalePivotX = detector.focusX
@@ -550,7 +343,6 @@ class SocChartView : View {
         }
     }
 
-    private var ignoreEvents = false
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         mScaleDetector?.onTouchEvent(ev)
 
@@ -582,3 +374,8 @@ class SocChartView : View {
         return true
     }
 }
+
+fun Context.sp(value: Int): Int = (value * resources.displayMetrics.scaledDensity).toInt()
+fun Context.sp(value: Float): Int = (value * resources.displayMetrics.scaledDensity).toInt()
+fun Context.fsp(value: Int): Float = sp(value).toFloat()
+fun Context.fsp(value: Float): Float = sp(value).toFloat()
