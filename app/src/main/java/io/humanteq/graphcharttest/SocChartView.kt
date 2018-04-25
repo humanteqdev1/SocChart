@@ -6,11 +6,12 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import com.google.gson.Gson
-import io.humanteq.graphcharttest.models.CommunityModel
+import io.humanteq.graphcharttest.models.CommunityModel2
 import io.humanteq.graphcharttest.models.SocChartModel
 import java.util.*
 import kotlin.math.cos
@@ -57,6 +58,76 @@ class SocChartView : View {
 
         mScaleDetector = ScaleGestureDetector(context, ScaleListener())
     }
+
+    val json2 = "{" +
+            "  \"friends\": 13," +
+            "  \"communities\": [" +
+            "    {" +
+            "      \"name\": \"imya\"," +
+            "      \"size\": 14" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 18" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 5" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 9" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 14" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 20" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 18" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 5" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 9" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 14" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 20" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 18" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 5" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 9" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 14" +
+            "    }," +
+            "    {" +
+            "      \"name\": \"imya2\"," +
+            "      \"size\": 20" +
+            "    }," +
+            "  ]" +
+            "}"
 
     val json = "{" +
             "  \"friends\": 13," +
@@ -272,10 +343,19 @@ class SocChartView : View {
             "  ]" +
             "}"
 
+
+    private var mScaleFactor = 1f
+    private var transX = 1f
+    private var transY = 1f
+    private var startX = 1f
+    private var startY = 1f
+    private var mScaleDetector: ScaleGestureDetector? = null
     private var chartWidth = 0
     private var chartHeight = 0
     private var screenCenterX = measuredWidth / 2f
     private var screenCenterY = measuredHeight / 2f
+    private var scalePivotX = screenCenterX
+    private var scalePivotY = screenCenterY
     private val initialRadius = resources.getDimension(R.dimen.initial_radius)
     private val clusterNameRadiusOffset = resources.getDimension(R.dimen.soc_chart_cluster_name_radius_offset)
     private val gson = Gson()
@@ -287,33 +367,57 @@ class SocChartView : View {
     private val paintTextLine = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paintBgWhite = Paint(Paint.ANTI_ALIAS_FLAG)
 
+    private val pointList = arrayListOf<SocPoint>()
+    private val lineList = arrayListOf<SocLine>()
+    private val textList = arrayListOf<SocText>()
+
+    data class SocPoint(val x: Float, val y: Float, val color: Int)
+    data class SocLine(val x1: Float, val y1: Float, val x2: Float, val y2: Float, val paint: Paint)
+    data class SocText(val text: String, val textX: Float, val textY: Float,
+                       val x1: Float, val y1: Float, val x2: Float, val y2: Float,
+                       val paintText: Paint,
+                       val paintLine: Paint)
+
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         if (chartHeight == 0 || chartWidth == 0)
             return
-        val model = gson.fromJson<SocChartModel>(json, SocChartModel::class.java) ?: return
+        val model = gson.fromJson<SocChartModel>(json2, SocChartModel::class.java) ?: return
 
         canvas?.save()
         canvas?.scale(mScaleFactor, mScaleFactor, screenCenterX, screenCenterY)
+//        canvas?.scale(mScaleFactor, mScaleFactor, scalePivotX, scalePivotY)
         canvas?.translate(transX, transY)
 
         canvas?.drawPaint(paintBgWhite)
 
-        drawMainPointAndFiends(model, canvas)
+        if (pointList.isEmpty())
+            buildMainPointAndFiends(model, canvas)
+        else
+            drawMainPointAndFiends(canvas)
 
         canvas?.restore()
     }
 
-    private val pointList = arrayListOf<SocPoint>()
-    private val lineList = arrayListOf<SocLine>()
+    private fun drawMainPointAndFiends(canvas: Canvas?) {
+        lineList.forEach {
+            canvas?.drawLine(it.x1, it.y1, it.x2, it.y2, it.paint)
+        }
+        pointList.forEach {
+            paint.color = it.color
+            canvas?.drawPoint(it.x, it.y, paint)
+        }
+        textList.forEach {
+            canvas?.drawLine(it.x1, it.y1, it.x2, it.y2, it.paintLine)
+            canvas?.drawText(it.text, it.textX, it.textY, it.paintText)
+        }
+    }
 
-    data class SocPoint(val x: Float, val y: Float, val color: Int)
-    data class SocLine(val x1: Float, val y1: Float, val x2: Float, val y2: Float, val color: Int)
-
-    private fun drawMainPointAndFiends(model: SocChartModel, canvas: Canvas?) {
+    private fun buildMainPointAndFiends(model: SocChartModel, canvas: Canvas?) {
         // Draw central point and friends around it
         paint.color = ContextCompat.getColor(context, R.color.colorAccent)
-        canvas?.drawPoint(screenCenterX, screenCenterY, paint)
+        pointList.add(SocPoint(screenCenterX, screenCenterY, paint.color))
+
         val angleStep = (100 + rand.nextInt(260)) / model.friends
         val radius = initialRadius + rand.nextInt(60)
         var prevX = screenCenterX
@@ -328,24 +432,27 @@ class SocChartView : View {
 
             val xC = (screenCenterX + x).toFloat()
             val yC = (screenCenterY + y).toFloat()
-            canvas?.drawLine(prevX, prevY, xC, yC, paintLine)
-            canvas?.drawPoint(xC, yC, paint)
+            pointList.add(SocPoint(xC, yC, paint.color))
+            lineList.add(SocLine(prevX, prevY, xC, yC, paintLine))
             prevX = xC
             prevY = yC
         }
 
-        drawClusterCenterPoints(model.communities, canvas)
+        buildClusterCenterPoints(model.communities, canvas)
     }
 
-    private fun drawClusterCenterPoints(clusters: List<CommunityModel>, canvas: Canvas?) {
+    private fun buildClusterCenterPoints(clusters: List<CommunityModel2>, canvas: Canvas?) {
         // Draw clusters around center point
         val randomRadianOffset = rand.nextInt(10)
-        var startAngle = 150
+        var startAngle = 190
         if (clusters.size > 7)
             startAngle = 360
         val randomAngleOffset = 360 - startAngle
         val angleStep = (startAngle + if (randomAngleOffset == 0) 0 else rand.nextInt(randomAngleOffset)) / clusters.size
         for (angle in 0 until clusters.size) {
+            if (clusters[angle] == null)
+                continue
+
             val radius = initialRadius + 150 + rand.nextInt(170)
             val color = Color.argb(200 + rand.nextInt(55),
                     50 + rand.nextInt(205),
@@ -358,22 +465,14 @@ class SocChartView : View {
             val randomOffsetY = rand.nextInt(30)
             val x = radius * cos(radian + randomRadianOffset) + if (randomOffsetX % 2 == 0) randomOffsetX else randomOffsetX * -1
             val y = radius * sin(radian + randomRadianOffset) + if (randomOffsetY % 2 == 0) randomOffsetY else randomOffsetY * -1
-//            val x = radius * cos(radian + randomRadianOffset)
-//            val y = radius * sin(radian + randomRadianOffset)
 
             // Draw central point of cluster
             val xC = (screenCenterX + x).toFloat()
             val yC = (screenCenterY + y).toFloat()
-            canvas?.drawLine(screenCenterX, screenCenterY, xC, yC, paintLine)
-            canvas?.drawPoint(xC, yC, paint)
+            pointList.add(SocPoint(xC, yC, paint.color))
+            lineList.add(SocLine(screenCenterX, screenCenterY, xC, yC, paintLine))
             val text = clusters[angle].name
             val textWidth = paintText.measureText(text)
-//            val textWidth2 = paintTextBg.measureText(text)
-////            paintText.color = color
-//            val textX = xC - textWidth / 2f
-//            val textX2 = xC - textWidth2 / 2f
-////            canvas?.drawText(text, textX2, yC, paintTextBg)
-//            canvas?.drawText(text, textX, yC, paintText)
 
             //Draw name of cluster
             val textRadius = clusterNameRadiusOffset
@@ -385,27 +484,31 @@ class SocChartView : View {
             else if (fixedTextX > chartWidth)
                 fixedTextX = chartWidth - textWidth
 
-            canvas?.drawLine(textX, textY, xC, yC, paintTextLine)
-            canvas?.drawText(text, fixedTextX, textY, paintText)
+            textList.add(SocText(text, fixedTextX, textY, textX, textY, xC, yC, paintText, paintTextLine))
 
-            drawCluster(xC, yC, clusters[angle], color, canvas)
+            buildCluster(xC, yC, clusters[angle], color, canvas)
         }
+
+        drawMainPointAndFiends(canvas)
     }
 
-    private fun drawCluster(parentCentralX: Float, parentCentralY: Float, cluster: CommunityModel, color: Int, canvas: Canvas?) {
+    private fun buildCluster(parentCentralX: Float, parentCentralY: Float, cluster: CommunityModel2, color: Int, canvas: Canvas?) {
+        if (cluster.size == 0)
+            return
+
         // Draw clusters around center point
-        val angleStep = (100 + rand.nextInt(260)) / cluster.data.size
+        val angleStep = (100 + rand.nextInt(260)) / cluster.size
         var prevX = parentCentralX
         var prevY = parentCentralY
         val randomRadianOffset = rand.nextInt(5)
-        for (angle in 0 until cluster.data.size) {
+        for (angle in 0 until cluster.size) {
             val radius = initialRadius + rand.nextInt(60)
             paint.color = color
 
             // Calculate center point of community
             val radian = (angle * angleStep) * 0.0174532925
-            val randomOffsetX = rand.nextInt(20 + angle)
-            val randomOffsetY = rand.nextInt(20 + angle)
+            val randomOffsetX = rand.nextInt(10 + angle)
+            val randomOffsetY = rand.nextInt(10 + angle)
             val x = radius * cos(radian + randomRadianOffset) + if (randomOffsetX % 3 == 0) randomOffsetX else randomOffsetX * -1
             val y = radius * sin(radian + randomRadianOffset) + if (randomOffsetY % 3 == 0) randomOffsetY else randomOffsetY * -1
 
@@ -414,9 +517,9 @@ class SocChartView : View {
             val yC = (parentCentralY + y).toFloat()
             val drawLineRandom = rand.nextInt(100)
             if (drawLineRandom % 7 == 0)
-                canvas?.drawLine(parentCentralX, parentCentralY, xC, yC, paintLine)
-            canvas?.drawLine(prevX, prevY, xC, yC, paintLine)
-            canvas?.drawPoint(xC, yC, paint)
+                lineList.add(SocLine(parentCentralX, parentCentralY, xC, yC, paintLine))
+            pointList.add(SocPoint(xC, yC, paint.color))
+            lineList.add(SocLine(prevX, prevY, xC, yC, paintLine))
             prevX = xC
             prevY = yC
         }
@@ -431,36 +534,49 @@ class SocChartView : View {
         screenCenterY = measuredHeight / 2f
     }
 
-    private var mScaleFactor = 1f
-    private var transX = 1f
-    private var transY = 1f
-    private var startX = 1f
-    private var startY = 1f
-    private var mScaleDetector: ScaleGestureDetector? = null
-
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
+            Log.e("---", " onScale")
             mScaleFactor *= detector.scaleFactor
 
+            scalePivotX = detector.focusX
+            scalePivotY = detector.focusY
+
             // Don't let the object get too small or too large.
-            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f))
+            mScaleFactor = Math.max(1f, Math.min(mScaleFactor, 4.0f))
 
             invalidate()
             return true
         }
     }
 
+    private var ignoreEvents = false
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        // Let the ScaleGestureDetector inspect all events.
         mScaleDetector?.onTouchEvent(ev)
 
-        if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
-            startX = ev.x
-            startY = ev.y
-        } else if (ev.actionMasked == MotionEvent.ACTION_MOVE) {
-            transX = ev.x - startX
-            transY = ev.y - startY
-            invalidate()
+        if (ev.pointerCount == 1) {
+            when {
+                ev.action == MotionEvent.ACTION_DOWN -> {
+                    startX = ev.rawX
+                    startY = ev.rawY
+                }
+                ev.action == MotionEvent.ACTION_MOVE -> {
+                    if (ignoreEvents)
+                        return true
+
+                    transX += (ev.rawX - startX) / mScaleFactor
+                    transY += (ev.rawY - startY) / mScaleFactor
+
+                    startX = ev.rawX
+                    startY = ev.rawY
+                    invalidate()
+                }
+                ev.action == MotionEvent.ACTION_UP -> {
+                    ignoreEvents = false
+                }
+            }
+        } else {
+            ignoreEvents = true
         }
 
         return true
